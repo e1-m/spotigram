@@ -14,10 +14,9 @@ class SpotifyClient:
         current_playback = self.client.current_playback()
 
         if current_playback and current_playback['is_playing']:
-            print(current_playback)
             current_track = current_playback['item']
             track_name = current_track['name']
             artists = ', '.join([artist['name'] for artist in current_track['artists']])
-            return f"Currently playing: {track_name} by {artists}"
+            return f"Currently listening to: {track_name} by {artists}"
         else:
             return None
