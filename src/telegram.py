@@ -22,8 +22,8 @@ class TelegramClientManager:
         full_me = await self.tc(GetFullUserRequest(me))
         return full_me.full_user.about
 
-    async def update_bio(self, status: str) -> None:
-        await self.tc(UpdateProfileRequest(about=status))
+    async def update_bio(self, about: str) -> None:
+        await self.tc(UpdateProfileRequest(about=about))
 
     async def update_emoji_status(self, document_id: int) -> None:
         await self.tc(UpdateEmojiStatusRequest(EmojiStatus(document_id)))

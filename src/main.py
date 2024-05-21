@@ -2,10 +2,6 @@ import asyncio
 
 from spotify import SpotifyClientManager
 from telegram import TelegramClientManager
-from telethon import TelegramClient
-from telethon.tl.functions.account import UpdateProfileRequest, UpdateEmojiStatusRequest
-from telethon.tl.functions.users import GetFullUserRequest
-from telethon.types import EmojiStatus
 
 from config import settings
 
@@ -28,6 +24,7 @@ async def main():
                     await telegram_client.update_emoji_status(settings.DEFAULT_EMOJI_STATUS_ID)
                     previous_track = ""
                 continue
+
             if previous_track != current_track:
                 await telegram_client.update_bio(current_track)
                 await telegram_client.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
