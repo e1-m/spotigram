@@ -21,4 +21,4 @@ class SpotifyClientManager:
             artists = ', '.join([artist['name'] for artist in current_track['artists']])
             link = current_track['external_urls']['spotify']
             result = f"Listening to {track_name} by {artists} on Spotify rn:\n"
-            return result + link if len(result + link) <= 140 else result
+            return result + link if len(result + link) <= settings.BIO_CHAR_LIMIT else result
