@@ -11,10 +11,10 @@ class Settings(BaseSettings):
     PHONE: str
     PASSWORD: str
     DEFAULT_BIO: str
+    SPOTIFY_EMOJI_STATUS_ID: int
+    DEFAULT_EMOJI_STATUS_ID: int
     SCOPE: str = 'user-read-playback-state user-read-currently-playing'
     REDIRECT_URL: str = 'http://localhost:8888/callback'
-    SPOTIFY_EMOJI_STATUS_ID: int = 5346074681004801565
-    DEFAULT_EMOJI_STATUS_ID: int = 0
     BIO_CHAR_LIMIT: int = 140
 
 
