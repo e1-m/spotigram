@@ -1,9 +1,11 @@
 from spotipy import SpotifyOAuth, Spotify
 
+from typing import Callable
+
 from config import settings
 
 
-class SpotifyClient:
+class SpotifyClientManager:
     def __init__(self):
         self.client = Spotify(auth_manager=SpotifyOAuth(client_id=settings.SPOTIFY_CLIENT_ID,
                                                         client_secret=settings.SPOTIFY_CLIENT_SECRET,
@@ -17,6 +19,5 @@ class SpotifyClient:
             current_track = current_playback['item']
             track_name = current_track['name']
             artists = ', '.join([artist['name'] for artist in current_track['artists']])
-            return f"Currently listening to: {track_name} by {artists}"
-        else:
-            return None
+            link = current_track['external_urls']['spotify']
+            return f"Currently listening to {track_name} by {artists} on Spotify:\n{link}"
