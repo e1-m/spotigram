@@ -1,9 +1,13 @@
 import asyncio
+from typing import Optional
 
 from spotify import SpotifyClientManager
 from telegram import TelegramClientManager
 from telethon.errors.rpcerrorlist import FloodWaitError
+
 from config import settings
+from src.schemas import Track
+from utils import form_listening_string
 
 
 async def main():
@@ -11,7 +15,7 @@ async def main():
     await telegram_client.start()
     spotify_client = SpotifyClientManager()
 
-    previous_track: str = ""
+    previous_track: Optional[Track] = None
     settings.DEFAULT_EMOJI_STATUS_ID = await telegram_client.get_current_emoji_status()
     settings.DEFAULT_BIO = await telegram_client.get_current_bio()
 
@@ -22,11 +26,11 @@ async def main():
                 if previous_track:
                     await telegram_client.update_bio(settings.DEFAULT_BIO)
                     await telegram_client.update_emoji_status(settings.DEFAULT_EMOJI_STATUS_ID)
-                    previous_track = ""
+                    previous_track = None
                 continue
 
             if previous_track != current_track:
-                await telegram_client.update_bio(current_track)
+                await telegram_client.update_bio(form_listening_string(current_track))
                 await telegram_client.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
                 previous_track = current_track
             await asyncio.sleep(1)

@@ -1,8 +1,9 @@
+from typing import Optional
+
 from spotipy import SpotifyOAuth, Spotify
 
-from typing import Callable
-
 from config import settings
+from src.schemas import Track
 
 
 class SpotifyClientManager:
@@ -12,13 +13,14 @@ class SpotifyClientManager:
                                                         redirect_uri=settings.REDIRECT_URL,
                                                         scope=settings.SCOPE))
 
-    def get_current_track(self) -> str | None:
+    def get_current_track(self) -> Optional[Track]:
         current_playback = self.client.current_playback()
 
         if current_playback and current_playback['is_playing']:
             current_track = current_playback['item']
-            track_name = current_track['name']
+
+            name = current_track['name']
             artists = ', '.join([artist['name'] for artist in current_track['artists']])
             link = current_track['external_urls']['spotify']
-            result = f"Listening to {track_name} by {artists} on Spotify:\n"
-            return result + link if len(result + link) <= settings.BIO_CHAR_LIMIT else result
+
+            return Track(name=name, artists=artists, link=link)
