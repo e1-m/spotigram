@@ -2,7 +2,7 @@ import asyncio
 
 from spotify import SpotifyClientManager
 from telegram import TelegramClientManager
-
+from telethon.errors.rpcerrorlist import FloodWaitError
 from config import settings
 
 
@@ -30,6 +30,8 @@ async def main():
                 await telegram_client.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
                 previous_track = current_track
             await asyncio.sleep(1)
+        except FloodWaitError as e:
+            await asyncio.sleep(5+e.seconds)
         except Exception:
             await telegram_client.update_bio(settings.DEFAULT_BIO)
             await telegram_client.update_emoji_status(settings.DEFAULT_EMOJI_STATUS_ID)
