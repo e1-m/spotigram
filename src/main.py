@@ -7,7 +7,7 @@ from telethon.errors.rpcerrorlist import FloodWaitError
 
 from config import settings
 from src.schemas import Track
-from utils import form_listening_string
+from utils import get_listening_to_track_string
 
 
 async def main():
@@ -30,7 +30,7 @@ async def main():
                 continue
 
             if previous_track != current_track:
-                await telegram_client.update_bio(form_listening_string(current_track))
+                await telegram_client.update_bio(get_listening_to_track_string(current_track))
                 await telegram_client.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
                 previous_track = current_track
             await asyncio.sleep(1)
