@@ -1,36 +1,64 @@
 import asyncio
+from threading import Thread
 from typing import Optional
+from urllib.error import HTTPError
 
 from spotify import SpotifyClientManager
+from src.config import settings
 from telegram import TelegramClientManager
-from telethon.errors.rpcerrorlist import FloodWaitError, AboutTooLongError
+from telethon.errors.rpcerrorlist import FloodWaitError
+from telethon.errors.rpcbaseerrors import RPCError
+import pystray
+from PIL import Image
 
 from src.schemas import Track
 
 
+class TrackChangeMonitor:
+    def __init__(self):
+        self.telegram_client = TelegramClientManager()
+        self.spotify_client = SpotifyClientManager()
+        self.is_monitoring = False
+
+    async def start_monitoring(self):
+        await self.telegram_client.start()
+        self.is_monitoring = True
+        await self.monitor_track_change()
+
+    def stop_monitoring(self):
+        self.is_monitoring = False
+
+    async def monitor_track_change(self):
+        previous_track: Optional[Track] = None
+        while self.is_monitoring:
+            try:
+                current_track = self.spotify_client.get_current_track()
+                if current_track:
+                    if previous_track != current_track:
+                        await self.telegram_client.display_track(current_track)
+                        previous_track = current_track
+                else:
+                    if previous_track:
+                        await self.telegram_client.hide_track()
+                        previous_track = None
+                await asyncio.sleep(settings.CHECK_TRACK_PERIOD)
+            except FloodWaitError as e:
+                await asyncio.sleep(settings.CHECK_TRACK_PERIOD + e.seconds)
+            except (RPCError, HTTPError):
+                await self.telegram_client.hide_track()
+        await self.telegram_client.hide_track()
+
+
 async def main():
-    telegram_client = TelegramClientManager()
-    spotify_client = SpotifyClientManager()
+    track_change_monitor = TrackChangeMonitor()
 
-    await telegram_client.start()
+    icon = pystray.Icon("spotigram", Image.open("icons/icon.png"),
+                        menu=pystray.Menu(pystray.MenuItem('Quit', lambda: track_change_monitor.stop_monitoring())))
+    Thread(target=icon.run).start()
 
-    previous_track: Optional[Track] = None
-    while True:
-        try:
-            current_track = spotify_client.get_current_track()
-            if current_track:
-                if previous_track != current_track:
-                    await telegram_client.display_track(current_track)
-                    previous_track = current_track
-            else:
-                if previous_track:
-                    await telegram_client.hide_track()
-                    previous_track = None
-            await asyncio.sleep(1)
-        except FloodWaitError as e:
-            await asyncio.sleep(5 + e.seconds)
-        except AboutTooLongError:
-            await telegram_client.hide_track()
+    await track_change_monitor.start_monitoring()
+
+    icon.stop()
 
 
 if __name__ == '__main__':
