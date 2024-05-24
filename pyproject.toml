@@ -6,12 +6,13 @@ authors = ["Ivan Mihun <vsk76090@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.12,<3.13"
 telethon = "^1.35.0"
 pydantic-settings = "^2.2.1"
 spotipy = "^2.23.0"
 pydantic = "^2.7.1"
 pystray = "^0.19.5"
+auto-py-to-exe = "^2.43.3"
 
 
 [build-system]
