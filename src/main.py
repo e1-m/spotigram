@@ -1,7 +1,9 @@
 import asyncio
+from requests.exceptions import RequestException
 from threading import Thread
 from typing import Optional
 from urllib.error import HTTPError
+
 
 from spotify import SpotifyClientManager
 from src.config import settings
@@ -44,7 +46,7 @@ class TrackChangeMonitor:
                 await asyncio.sleep(settings.CHECK_TRACK_PERIOD)
             except FloodWaitError as e:
                 await asyncio.sleep(settings.CHECK_TRACK_PERIOD + e.seconds)
-            except (RPCError, HTTPError):
+            except (RPCError, HTTPError, RequestException):
                 await self.telegram_client.hide_track()
         await self.telegram_client.hide_track()
 
