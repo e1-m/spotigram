@@ -4,16 +4,15 @@ from threading import Thread
 from typing import Optional
 from urllib.error import HTTPError
 
-
-from spotify import SpotifyClientManager
-from src.config import settings
-from telegram import TelegramClientManager
 from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon.errors.rpcbaseerrors import RPCError
 import pystray
 from PIL import Image
 
-from src.schemas import Track
+from spotify import SpotifyClientManager
+from telegram import TelegramClientManager
+from schemas import Track
+from config import settings
 
 
 class TrackChangeMonitor:

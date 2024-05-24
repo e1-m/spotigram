@@ -4,7 +4,7 @@ from telethon.tl.functions.users import GetFullUserRequest
 from telethon.types import EmojiStatus
 
 from config import settings
-from src.schemas import Track
+from schemas import Track
 from utils import get_listening_to_track_string
 
 

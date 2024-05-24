@@ -1,5 +1,5 @@
 from schemas import Track
-from src.config import settings
+from config import settings
 
 
 def get_listening_to_track_string(track: Track) -> str:

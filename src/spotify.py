@@ -3,7 +3,7 @@ from typing import Optional
 from spotipy import SpotifyOAuth, Spotify
 
 from config import settings
-from src.schemas import Track
+from schemas import Track
 
 
 class SpotifyClientManager:
