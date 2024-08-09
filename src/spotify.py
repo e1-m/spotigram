@@ -1,6 +1,7 @@
 from typing import Optional
 
 from spotipy import SpotifyOAuth, Spotify
+from spotipy.exceptions import SpotifyException
 
 from config import settings
 from schemas import Track
@@ -14,13 +15,13 @@ class SpotifyClientManager:
                                                         scope=settings.SCOPE))
 
     def get_current_track(self) -> Optional[Track]:
-        current_playback = self.client.current_playback()
-
-        if current_playback and current_playback['is_playing']:
-            current_track = current_playback['item']
-
-            name = current_track['name']
-            artists = ', '.join([artist['name'] for artist in current_track['artists']])
-            link = current_track['external_urls']['spotify']
-
-            return Track(name=name, artists=artists, link=link)
+        try:
+            playback = self.client.current_playback()
+            if playback and playback.get('is_playing'):
+                if track := playback.get('item'):
+                    name = track['name']
+                    artists = ', '.join([artist['name'] for artist in track['artists']])
+                    link = track['external_urls']['spotify']
+                    return Track(name=name, artists=artists, link=link)
+        except SpotifyException:
+            return None
