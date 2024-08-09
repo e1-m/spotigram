@@ -1,0 +1,13 @@
+services:
+    app:
+        build: .
+        stdin_open: true
+        tty: true
+        env_file: .env
+        environment:
+          USE_TRAY: false
+        volumes:
+          - data:/data
+
+volumes:
+  data:
