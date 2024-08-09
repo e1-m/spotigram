@@ -1,4 +1,5 @@
 import asyncio
+
 from requests.exceptions import RequestException
 from threading import Thread
 from typing import Optional
@@ -6,8 +7,6 @@ from urllib.error import HTTPError
 
 from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon.errors.rpcbaseerrors import RPCError
-import pystray
-from PIL import Image
 
 from spotify import SpotifyClientManager
 from telegram import TelegramClientManager
@@ -49,18 +48,25 @@ class TrackChangeMonitor:
                 await self.telegram_client.hide_track()
         await self.telegram_client.hide_track()
 
-#TODO: review code, make the code input possible
-#TODO: make adding several accounts possible 
-async def main():
-    track_change_monitor = TrackChangeMonitor()
 
-    icon = pystray.Icon("spotigram", Image.open("icons/icon.png"),
-                        menu=pystray.Menu(pystray.MenuItem('Quit', lambda: track_change_monitor.stop_monitoring())))
-    Thread(target=icon.run).start()
+if settings.USE_TRAY:
+    import pystray
+    from PIL import Image
 
-    await track_change_monitor.start_monitoring()
+    async def main():
+        track_change_monitor = TrackChangeMonitor()
 
-    icon.stop()
+        icon = pystray.Icon("spotigram", Image.open("icons/icon.png"),
+                            menu=pystray.Menu(pystray.MenuItem('Quit', lambda: track_change_monitor.stop_monitoring())))
+        Thread(target=icon.run).start()
+
+        await track_change_monitor.start_monitoring()
+
+        icon.stop()
+else:
+    async def main():
+        track_change_monitor = TrackChangeMonitor()
+        await track_change_monitor.start_monitoring()
 
 
 if __name__ == '__main__':
