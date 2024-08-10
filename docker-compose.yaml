@@ -7,7 +7,7 @@ services:
         environment:
           USE_TRAY: false
         volumes:
-          - data:/data
+          - data:/app/session/
 
 volumes:
   data:

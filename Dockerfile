@@ -9,5 +9,6 @@ RUN pip install poetry
 RUN poetry config virtualenvs.create false && poetry install --without tray,dev
 
 COPY src ./
+COPY cache ./cache
 
 CMD ["/bin/sh"]

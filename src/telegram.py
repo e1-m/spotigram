@@ -1,3 +1,5 @@
+import os
+
 from telethon import TelegramClient
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateEmojiStatusRequest
 from telethon.tl.functions.users import GetFullUserRequest
@@ -10,7 +12,9 @@ from utils import get_listening_to_track_string
 
 class TelegramClientManager:
     def __init__(self):
-        self.tc = TelegramClient('tg_session', settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH)
+        if not os.path.exists('session'):
+            os.makedirs('session')
+        self.tc = TelegramClient('session/tg_session', settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH)
 
     async def start(self):
         await self.tc.start(phone=settings.PHONE, password=settings.PASSWORD)

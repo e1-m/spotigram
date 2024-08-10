@@ -1,6 +1,7 @@
+import os
 from typing import Optional
 
-from spotipy import SpotifyOAuth, Spotify
+from spotipy import SpotifyOAuth, Spotify, CacheFileHandler
 from spotipy.exceptions import SpotifyException
 
 from config import settings
@@ -9,10 +10,14 @@ from schemas import Track
 
 class SpotifyClientManager:
     def __init__(self):
+        if not os.path.exists('cache'):
+            os.makedirs('cache')
         self.client = Spotify(auth_manager=SpotifyOAuth(client_id=settings.SPOTIFY_CLIENT_ID,
                                                         client_secret=settings.SPOTIFY_CLIENT_SECRET,
                                                         redirect_uri=settings.REDIRECT_URL,
-                                                        scope=settings.SCOPE))
+                                                        scope=settings.SCOPE,
+                                                        cache_handler=CacheFileHandler(cache_path='cache/spotify.cache')
+                                                        ))
 
     def get_current_track(self) -> Optional[Track]:
         try:

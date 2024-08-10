@@ -60,12 +60,14 @@ if settings.USE_TRAY:
                             menu=pystray.Menu(pystray.MenuItem('Quit', lambda: track_change_monitor.stop_monitoring())))
         Thread(target=icon.run).start()
 
+        print("The app has started")
         await track_change_monitor.start_monitoring()
 
         icon.stop()
 else:
     async def main():
         track_change_monitor = TrackChangeMonitor()
+        print("The app has started")
         await track_change_monitor.start_monitoring()
 
 
