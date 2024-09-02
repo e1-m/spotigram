@@ -21,7 +21,7 @@ class TelegramClientManager:
         me = await self.tc.get_me()
         full_me = await self.tc(GetFullUserRequest(me))
         settings.DEFAULT_EMOJI_STATUS_ID = me.emoji_status.document_id
-        settings.DEFAULT_BIO = full_me.full_user.about
+        settings.DEFAULT_BIO = full_me.full_user.about or ''
 
     async def display_track(self, track: Track):
         await self.tc(UpdateEmojiStatusRequest(EmojiStatus(settings.SPOTIFY_EMOJI_STATUS_ID)))

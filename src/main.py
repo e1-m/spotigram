@@ -67,7 +67,7 @@ if settings.USE_TRAY:
 else:
     async def main():
         track_change_monitor = TrackChangeMonitor()
-        print("The app has started")
+        print("The app has started without tray")
         await track_change_monitor.start_monitoring()
 
 
