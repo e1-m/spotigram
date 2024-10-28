@@ -21,7 +21,5 @@ class Settings(BaseSettings):
     REDIRECT_URL: str = 'http://localhost:8888/callback'
     BIO_CHAR_LIMIT: int = 140
 
-    USE_TRAY: bool
-
 
 settings = Settings()

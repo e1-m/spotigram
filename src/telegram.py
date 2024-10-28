@@ -20,7 +20,7 @@ class TelegramClientManager:
         self.default_emoji_status_id: int = 0
 
     async def start(self):
-        await self.tc.start(phone=settings.PHONE, password=settings.PASSWORD)
+        await self.tc.start()
         me = await self.tc.get_me()
         full_me = await self.tc(GetFullUserRequest(me))
         self.default_emoji_status_id = me.emoji_status.document_id

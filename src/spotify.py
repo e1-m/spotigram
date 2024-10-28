@@ -1,5 +1,6 @@
 import asyncio
 import os
+from collections import defaultdict
 from typing import Optional, Callable, Coroutine
 from urllib.error import HTTPError
 from requests.exceptions import RequestException
@@ -8,13 +9,12 @@ from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon.errors.rpcbaseerrors import RPCError
 from spotipy import SpotifyOAuth, Spotify, CacheFileHandler
 from spotipy.exceptions import SpotifyException
-from events import Events
 
 from config import settings
 from schemas import Track
 
 
-class SpotifyClientManager:
+class SpotifyMonitor:
     def __init__(self):
         os.makedirs(settings.SESSIONS_PATH, exist_ok=True)
         self.client = Spotify(auth_manager=SpotifyOAuth(client_id=settings.SPOTIFY_CLIENT_ID,
@@ -24,8 +24,23 @@ class SpotifyClientManager:
                                                         cache_handler=CacheFileHandler(
                                                             cache_path=settings.SESSIONS_PATH + 'spotify.cache')
                                                         ))
+        self.is_monitoring = False
+        self.callbacks = defaultdict(list)
 
-    def get_current_track(self) -> Optional[Track]:
+    async def start_monitoring(self):
+        self.is_monitoring = True
+        await self._monitor_playback()
+
+    def stop_monitoring(self):
+        self.is_monitoring = False
+
+    def on_track_change(self, func: Callable[[Track], Coroutine[None, None, None]]):
+        self.callbacks['on_track_change'].append(func)
+
+    def on_playback_end(self, func: Callable[[], Coroutine[None, None, None]]):
+        self.callbacks['on_playback_end'].append(func)
+
+    def _get_current_track(self) -> Optional[Track]:
         try:
             playback = self.client.current_playback()
             if playback and playback.get('is_playing'):
@@ -38,42 +53,26 @@ class SpotifyClientManager:
         except SpotifyException:
             return None
 
-
-class SpotifyMonitor:
-    def __init__(self):
-        self.events = Events('on_track_change', 'on_playback_end')
-        self.spotify_client = SpotifyClientManager()
-        self.is_monitoring = False
-
-    async def start_monitoring(self):
-        self.is_monitoring = True
-        await self._monitor_playback()
-
-    def stop_monitoring(self):
-        self.is_monitoring = False
-
     async def _monitor_playback(self):
         previous_track: Optional[Track] = None
         while self.is_monitoring:
             try:
-                current_track = self.spotify_client.get_current_track()
+                current_track = self._get_current_track()
                 if current_track:
                     if previous_track != current_track:
-                        await self.events.on_track_change(current_track)
+                        await self._fire_callbacks('on_track_change', current_track)
                         previous_track = current_track
                 else:
                     if previous_track:
-                        await self.events.on_playback_end()
+                        await self._fire_callbacks('on_playback_end')
                         previous_track = None
                 await asyncio.sleep(settings.CHECK_TRACK_PERIOD)
             except FloodWaitError as e:
                 await asyncio.sleep(settings.CHECK_TRACK_PERIOD + e.seconds)
             except (RPCError, HTTPError, RequestException):
-                await self.events.on_playback_end()
-        await self.events.on_playback_end()
+                await self._fire_callbacks('on_playback_end')
+        await self._fire_callbacks('on_playback_end')
 
-    def on_track_change(self, func: Callable[[Track], Coroutine[None, None, None]]):
-        self.events.on_track_change = func
-
-    def on_playback_end(self, func: Callable[[], Coroutine[None, None, None]]):
-        self.events.on_playback_end = func
+    async def _fire_callbacks(self, event: str, *args, **kwargs):
+        for callback in self.callbacks[event]:
+            await callback(*args, **kwargs)

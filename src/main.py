@@ -1,12 +1,13 @@
 import asyncio
 
 from threading import Thread
+import pystray
+from PIL import Image
 
 from spotify import SpotifyMonitor
 from telegram import TelegramClientManager
 from schemas import Track
-import pystray
-from PIL import Image
+
 
 if __name__ == '__main__':
     spotify_monitor = SpotifyMonitor()
@@ -15,12 +16,12 @@ if __name__ == '__main__':
 
 
     @spotify_monitor.on_track_change
-    async def on_track_change(track: Track):
+    async def display_track(track: Track):
         await telegram_client.display_track(track)
 
 
     @spotify_monitor.on_playback_end
-    async def on_playback_end():
+    async def hide_track():
         await telegram_client.hide_track()
 
 
