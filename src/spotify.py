@@ -10,13 +10,13 @@ from schemas import Track
 
 class SpotifyClientManager:
     def __init__(self):
-        if not os.path.exists('cache'):
-            os.makedirs('cache')
+        os.makedirs(settings.SESSIONS_PATH, exist_ok=True)
         self.client = Spotify(auth_manager=SpotifyOAuth(client_id=settings.SPOTIFY_CLIENT_ID,
                                                         client_secret=settings.SPOTIFY_CLIENT_SECRET,
                                                         redirect_uri=settings.REDIRECT_URL,
                                                         scope=settings.SCOPE,
-                                                        cache_handler=CacheFileHandler(cache_path='cache/spotify.cache')
+                                                        cache_handler=CacheFileHandler(
+                                                            cache_path=settings.SESSIONS_PATH + 'spotify.cache')
                                                         ))
 
     def get_current_track(self) -> Optional[Track]:

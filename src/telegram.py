@@ -12,9 +12,10 @@ from utils import get_listening_to_track_string
 
 class TelegramClientManager:
     def __init__(self):
-        if not os.path.exists('session'):
-            os.makedirs('session')
-        self.tc = TelegramClient('session/tg_session', settings.TELEGRAM_API_ID, settings.TELEGRAM_API_HASH)
+        os.makedirs(settings.SESSIONS_PATH, exist_ok=True)
+        self.tc = TelegramClient(settings.SESSIONS_PATH + 'tg_session',
+                                 settings.TELEGRAM_API_ID,
+                                 settings.TELEGRAM_API_HASH)
 
     async def start(self):
         await self.tc.start(phone=settings.PHONE, password=settings.PASSWORD)
