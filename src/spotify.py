@@ -27,6 +27,7 @@ class SpotifyClientManager:
                     name = track['name']
                     artists = ', '.join([artist['name'] for artist in track['artists']])
                     link = track['external_urls']['spotify']
+
                     return Track(name=name, artists=artists, link=link)
         except SpotifyException:
             return None

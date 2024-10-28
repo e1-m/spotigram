@@ -12,8 +12,6 @@ class Settings(BaseSettings):
     PHONE: str
     PASSWORD: str
 
-    DEFAULT_BIO: str = ''
-    DEFAULT_EMOJI_STATUS_ID: int = 0
     SPOTIFY_EMOJI_STATUS_ID: int = 5346074681004801565
 
     CHECK_TRACK_PERIOD: int = 3

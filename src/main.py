@@ -56,7 +56,7 @@ if settings.USE_TRAY:
     async def main():
         track_change_monitor = TrackChangeMonitor()
 
-        icon = pystray.Icon("spotigram", Image.open("icons/icon.png"),
+        icon = pystray.Icon("spotigram", Image.open("icons/spotigram.png"),
                             menu=pystray.Menu(pystray.MenuItem('Quit', lambda: track_change_monitor.stop_monitoring())))
         Thread(target=icon.run).start()
 
