@@ -19,12 +19,19 @@ class TelegramClientManager:
         self.default_bio: str = ''
         self.default_emoji_status_id: int = 0
 
-    async def start(self):
+    async def connect(self):
         await self.tc.start()
+        self.default_emoji_status_id = await self.get_emoji_status()
+        self.default_bio = await self.get_bio() or ''
+
+    async def get_emoji_status(self):
+        me = await self.tc.get_me()
+        return me.emoji_status.document_id
+
+    async def get_bio(self):
         me = await self.tc.get_me()
         full_me = await self.tc(GetFullUserRequest(me))
-        self.default_emoji_status_id = me.emoji_status.document_id
-        self.default_bio = full_me.full_user.about or ''
+        return full_me.full_user.about
 
     async def display_track(self, track: Track):
         await self.tc(UpdateEmojiStatusRequest(EmojiStatus(settings.SPOTIFY_EMOJI_STATUS_ID)))

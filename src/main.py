@@ -12,7 +12,7 @@ from schemas import Track
 async def main():
     spotify_monitor = SpotifyMonitor()
     telegram_client = TelegramClientManager()
-    await telegram_client.start()
+    await telegram_client.connect()
 
     @spotify_monitor.on_track_change
     async def display_track(track: Track):
