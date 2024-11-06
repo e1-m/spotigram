@@ -14,6 +14,10 @@ from config import settings
 from schemas import Track
 
 
+class SpotifyMonitoringException(Exception):
+    pass
+
+
 class SpotifyMonitor:
     def __init__(self):
         os.makedirs(settings.SESSIONS_PATH, exist_ok=True)
@@ -28,10 +32,14 @@ class SpotifyMonitor:
         self.callbacks = defaultdict(list)
 
     async def start_monitoring(self):
+        if self.is_monitoring:
+            raise SpotifyMonitoringException('Cannot start monitoring: monitoring is already active')
         self.is_monitoring = True
         await self._monitor_playback()
 
     def stop_monitoring(self):
+        if not self.is_monitoring:
+            raise SpotifyMonitoringException('Cannot stop monitoring: monitoring is not active')
         self.is_monitoring = False
 
     def on_track_change(self, func: Callable[[Track], Coroutine[None, None, None]]):
