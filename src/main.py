@@ -6,7 +6,7 @@ from PIL import Image
 
 from spotify import SpotifyMonitor
 from telegram import TelegramClientManager
-from schemas import Track
+from track import Track
 
 
 async def main():

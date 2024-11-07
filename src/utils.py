@@ -1,8 +1,8 @@
-from schemas import Track
+from track import Track
 from config import settings
 
 
-def build_listening_to_string(track: Track) -> str:
+def build_listening_string(track: Track) -> str:
     string_without_link = f"Listening to {track.name} by {track.artists} on Spotify"
     string_with_link = string_without_link + ":\n" + track.link
 

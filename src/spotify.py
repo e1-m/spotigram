@@ -11,7 +11,7 @@ from spotipy import SpotifyOAuth, Spotify, CacheFileHandler
 from spotipy.exceptions import SpotifyException
 
 from config import settings
-from schemas import Track
+from track import Track
 
 
 class SpotifyMonitoringException(Exception):

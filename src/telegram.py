@@ -6,8 +6,8 @@ from telethon.tl.functions.users import GetFullUserRequest
 from telethon.types import EmojiStatus
 
 from config import settings
-from schemas import Track
-from utils import build_listening_to_string
+from track import Track
+from utils import build_listening_string
 
 
 class TelegramClientManager:
@@ -35,7 +35,7 @@ class TelegramClientManager:
 
     async def display_track(self, track: Track):
         await self.tc(UpdateEmojiStatusRequest(EmojiStatus(settings.SPOTIFY_EMOJI_STATUS_ID)))
-        await self.tc(UpdateProfileRequest(about=build_listening_to_string(track)))
+        await self.tc(UpdateProfileRequest(about=build_listening_string(track)))
 
     async def hide_track(self):
         await self.tc(UpdateEmojiStatusRequest(EmojiStatus(self.default_emoji_status_id)))
