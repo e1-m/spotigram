@@ -26,6 +26,7 @@ async def main():
                         menu=pystray.Menu(pystray.MenuItem('Quit', lambda: spotify_monitor.stop_monitoring())))
     Thread(target=icon.run).start()
     print("The app has started")
+    asyncio.create_task(telegram_client.monitor_bio_changes())
     await spotify_monitor.start_monitoring()
     icon.stop()
 
