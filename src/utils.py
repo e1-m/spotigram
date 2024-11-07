@@ -1,3 +1,5 @@
+import re
+
 from track import Track
 from config import settings
 
@@ -12,3 +14,7 @@ def build_listening_string(track: Track) -> str:
         return string_without_link
     else:
         return f"Listening to {track.name} on Spotify"
+
+
+def clean_whitespaces(string: str) -> str:
+    return re.sub(r'\s+', '', string)
