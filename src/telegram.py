@@ -5,6 +5,7 @@ from telethon import TelegramClient
 from telethon.tl.functions.account import UpdateProfileRequest, UpdateEmojiStatusRequest
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.types import EmojiStatus
+from telethon.errors import RPCError
 
 from config import settings
 from track import Track
@@ -41,14 +42,26 @@ class TelegramClientManager:
     async def display_track(self, track: Track):
         self.current_emoji_status = settings.SPOTIFY_EMOJI_STATUS_ID
         self.current_bio = build_listening_string(track)
-        await self.tc(UpdateEmojiStatusRequest(EmojiStatus(self.current_emoji_status)))
-        await self.tc(UpdateProfileRequest(about=self.current_bio))
+        await self.update_bio()
+        await self.update_emoji_status()
 
     async def hide_track(self):
         self.current_emoji_status = self.default_emoji_status
         self.current_bio = self.default_bio
-        await self.tc(UpdateEmojiStatusRequest(EmojiStatus(self.default_emoji_status)))
-        await self.tc(UpdateProfileRequest(about=self.default_bio))
+        await self.update_bio()
+        await self.update_emoji_status()
+
+    async def update_bio(self):
+        try:
+            await self.tc(UpdateProfileRequest(about=self.current_bio))
+        except RPCError:
+            pass
+
+    async def update_emoji_status(self):
+        try:
+            await self.tc(UpdateEmojiStatusRequest(EmojiStatus(self.current_emoji_status)))
+        except RPCError:
+            pass
 
     async def monitor_bio_changes(self):
         while True:
