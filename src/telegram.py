@@ -12,6 +12,10 @@ from track import Track
 from utils import build_listening_string, clean_whitespaces
 
 
+class TelegramMonitoringException(Exception):
+    pass
+
+
 class TelegramClientManager:
     def __init__(self):
         os.makedirs(settings.SESSIONS_PATH, exist_ok=True)
@@ -22,6 +26,7 @@ class TelegramClientManager:
         self.default_emoji_status: int = 0
         self.current_bio: str = ''
         self.current_emoji_status: int = 0
+        self.is_monitoring = False
 
     async def connect(self):
         await self.tc.start()
@@ -63,8 +68,19 @@ class TelegramClientManager:
         except RPCError:
             pass
 
-    async def monitor_bio_changes(self):
-        while True:
+    async def start_monitoring(self):
+        if self.is_monitoring:
+            raise TelegramMonitoringException('Cannot start monitoring: monitoring is already active')
+        self.is_monitoring = True
+        await self._monitor_bio_changes()
+
+    def stop_monitoring(self):
+        if not self.is_monitoring:
+            raise TelegramMonitoringException('Cannot stop monitoring: monitoring is not active')
+        self.is_monitoring = False
+
+    async def _monitor_bio_changes(self):
+        while self.is_monitoring:
             bio = clean_whitespaces(await self.get_bio())
             if bio != clean_whitespaces(self.default_bio) and bio != clean_whitespaces(self.current_bio):
                 self.default_bio = bio

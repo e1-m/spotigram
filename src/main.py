@@ -24,13 +24,11 @@ async def main():
 
     print("The app has started")
     icon = pystray.Icon("spotigram", Image.open("icons/spotigram.png"))
-    icon.menu = pystray.Menu(pystray.MenuItem('Quit', lambda: spotify_monitor.stop_monitoring() or icon.stop()))
+    icon.menu = pystray.Menu(pystray.MenuItem('Quit', lambda: (spotify_monitor.stop_monitoring() or
+                                                               telegram_client.stop_monitoring() or
+                                                               icon.stop())))
     Thread(target=icon.run).start()
-    await asyncio.wait(
-        [asyncio.create_task(spotify_monitor.start_monitoring()),
-         asyncio.create_task(telegram_client.monitor_bio_changes())],
-        return_when=asyncio.FIRST_COMPLETED
-    )
+    await asyncio.gather(spotify_monitor.start_monitoring(), telegram_client.start_monitoring())
 
 
 if __name__ == '__main__':
