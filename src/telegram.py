@@ -45,26 +45,24 @@ class TelegramClientManager:
         return full_me.full_user.about
 
     async def display_track(self, track: Track):
-        self.last_set_emoji_status = settings.SPOTIFY_EMOJI_STATUS_ID
-        self.last_set_bio = build_listening_string(track)
-        await self.update_bio()
-        await self.update_emoji_status()
+        await self.update_bio(build_listening_string(track))
+        await self.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
 
     async def hide_track(self):
-        self.last_set_emoji_status = self.default_emoji_status
-        self.last_set_bio = self.default_bio
-        await self.update_bio()
-        await self.update_emoji_status()
+        await self.update_bio(self.default_bio)
+        await self.update_emoji_status(self.default_emoji_status)
 
-    async def update_bio(self):
+    async def update_bio(self, new_bio: str):
         try:
-            await self.tc(UpdateProfileRequest(about=self.last_set_bio))
+            await self.tc(UpdateProfileRequest(about=new_bio))
+            self.last_set_bio = new_bio
         except RPCError:
             pass
 
-    async def update_emoji_status(self):
+    async def update_emoji_status(self, new_emoji_status: int):
         try:
-            await self.tc(UpdateEmojiStatusRequest(EmojiStatus(self.last_set_emoji_status)))
+            await self.tc(UpdateEmojiStatusRequest(EmojiStatus(new_emoji_status)))
+            self.last_set_emoji_status = new_emoji_status
         except RPCError:
             pass
 
@@ -84,6 +82,7 @@ class TelegramClientManager:
             bio = clean_whitespaces(await self.get_bio())
             if bio != clean_whitespaces(self.default_bio) and bio != clean_whitespaces(self.last_set_bio):
                 self.default_bio = bio
+                await self.update_bio(self.last_set_bio)
             await asyncio.sleep(1)
 
     async def _monitor_emoji_status_changes(self):
@@ -91,4 +90,5 @@ class TelegramClientManager:
             emoji_status = await self.get_emoji_status()
             if emoji_status != self.default_emoji_status and emoji_status != self.last_set_emoji_status:
                 self.default_emoji_status = emoji_status
+                await self.update_emoji_status(self.last_set_emoji_status)
             await asyncio.sleep(1)
