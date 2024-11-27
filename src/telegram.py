@@ -72,7 +72,7 @@ class TelegramClientManager:
         if self.is_monitoring:
             raise TelegramMonitoringException('Cannot start monitoring: monitoring is already active')
         self.is_monitoring = True
-        await self._monitor_bio_changes()
+        await asyncio.gather(self._monitor_emoji_status_changes(), self._monitor_bio_changes())
 
     def stop_monitoring(self):
         if not self.is_monitoring:
@@ -84,6 +84,10 @@ class TelegramClientManager:
             bio = clean_whitespaces(await self.get_bio())
             if bio != clean_whitespaces(self.default_bio) and bio != clean_whitespaces(self.current_bio):
                 self.default_bio = bio
+            await asyncio.sleep(1)
+
+    async def _monitor_emoji_status_changes(self):
+        while self.is_monitoring:
             emoji_status = await self.get_emoji_status()
             if emoji_status != self.default_emoji_status and emoji_status != self.current_emoji_status:
                 self.default_emoji_status = emoji_status
