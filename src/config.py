@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     SESSIONS_PATH: str = 'sessions/'
     SCOPE: str = 'user-read-playback-state user-read-currently-playing'
-    REDIRECT_URL: str = 'http://localhost:8888/callback'
+    REDIRECT_URL: str = 'http://127.0.0.1:8888/callback'
     BIO_CHAR_LIMIT: int = 140
 
 
