@@ -28,8 +28,8 @@ class TelegramClientManager:
         self.last_set_emoji_status: int = 0
         self.is_monitoring = False
 
-    async def connect(self):
-        await self.tc.start()
+    async def connect(self, phone, password=None):
+        await self.tc.start(phone=phone, password=password)
         self.default_emoji_status = await self.get_emoji_status()
         self.default_bio = await self.get_bio() or ''
         self.last_set_emoji_status = self.default_emoji_status

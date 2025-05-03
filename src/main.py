@@ -6,6 +6,7 @@ import pystray
 from PIL import Image
 
 from spotify import SpotifyMonitor, SpotifyMonitoringException
+from src.config import settings
 from telegram import TelegramClientManager, TelegramMonitoringException
 from track import Track
 
@@ -40,7 +41,10 @@ signal.signal(signal.SIGTERM, clean_up)
 
 
 async def main():
-    await telegram_client.connect()
+    await telegram_client.connect(
+        settings.PHONE,
+        settings.PASSWORD
+    )
 
     print("The app has started")
     paused = Lock()
