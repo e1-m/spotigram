@@ -1,24 +1,17 @@
-[tool.poetry]
+[project]
 name = "spotigram"
 version = "0.1.0"
-description = ""
-authors = ["Ivan Mihun <vsk76090@gmail.com>"]
-readme = "README.md"
+description = "A lightweight app that automatically updates your Telegram bio to display the Spotify track you are currently listening to and sets a Spotify icon as your emoji status."
+requires-python = ">=3.13"
+dependencies = [
+    "telethon>=1.35.0,<2.0.0",
+    "pydantic-settings>=2.2.1,<3.0.0",
+    "spotipy>=2.23.0,<3.0.0",
+    "pydantic>=2.7.1,<3.0.0",
+    "pystray>=0.19.5,<0.20.0",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.12,<3.13"
-telethon = "^1.35.0"
-pydantic-settings = "^2.2.1"
-spotipy = "^2.23.0"
-pydantic = "^2.7.1"
-
-[tool.poetry.group.tray.dependencies]
-pystray = "^0.19.5"
-
-[tool.poetry.group.dev.dependencies]
-auto-py-to-exe = "^2.43.3"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[project.optional-dependencies]
+dev = [
+    "auto-py-to-exe>=2.43.3,<3.0.0"
+]
