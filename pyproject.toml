@@ -11,7 +11,7 @@ dependencies = [
     "pystray>=0.19.5,<0.20.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "auto-py-to-exe>=2.43.3,<3.0.0"
+    "auto-py-to-exe>=2.46.0",
 ]
