@@ -51,13 +51,20 @@ class SpotifyMonitor:
     def _get_current_track(self) -> Optional[Track]:
         try:
             playback = self.client.current_playback()
-            if playback and playback.get('is_playing'):
-                if track := playback.get('item'):
-                    name = track['name']
-                    artists = ', '.join([artist['name'] for artist in track['artists']])
-                    link = track['external_urls']['spotify']
 
-                    return Track(name=name, artists=artists, link=link)
+            if playback is None:
+                return None
+
+            if (playback['currently_playing_type'] != 'track'
+                    or playback['is_playing'] is False
+                    or playback['item'] is None):
+                return None
+
+            track = playback['item']
+
+            return Track(name=track['name'],
+                         artists=', '.join([artist['name'] for artist in track['artists']]),
+                         link=track['external_urls']['spotify'])
         except SpotifyException:
             return None
 
