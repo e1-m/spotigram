@@ -79,8 +79,9 @@ class TelegramClientManager:
 
     async def _monitor_bio_changes(self):
         while self.is_monitoring:
-            bio = clean_whitespaces(await self.get_bio())
-            if bio != clean_whitespaces(self.default_bio) and bio != clean_whitespaces(self.last_set_bio):
+            bio = await self.get_bio()
+            if (clean_whitespaces(bio) != clean_whitespaces(self.default_bio)
+                    and clean_whitespaces(bio) != clean_whitespaces(self.last_set_bio)):
                 self.default_bio = bio
                 await self.update_bio(self.last_set_bio)
             await asyncio.sleep(1)
