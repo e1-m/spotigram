@@ -24,7 +24,7 @@ class TelegramClientManager:
                                  settings.TELEGRAM_API_HASH)
         self.default_bio: str = ''
         self.default_emoji_status: int = 0
-        self.last_set_bio: str = ''
+        self.last_set_bio: str | None = None
         self.last_set_emoji_status: int = 0
         self.is_monitoring = False
 
@@ -33,7 +33,7 @@ class TelegramClientManager:
         self.default_emoji_status = await self.get_emoji_status()
         self.default_bio = await self.get_bio() or ''
         self.last_set_emoji_status = self.default_emoji_status
-        self.last_set_bio = self.default_bio
+        self.last_set_bio = None
 
     async def get_emoji_status(self):
         me = await self.tc.get_me()
@@ -80,11 +80,23 @@ class TelegramClientManager:
     async def _monitor_bio_changes(self):
         while self.is_monitoring:
             bio = await self.get_bio()
-            if (clean_whitespaces(bio) != clean_whitespaces(self.default_bio)
-                    and clean_whitespaces(bio) != clean_whitespaces(self.last_set_bio)):
+            if self._was_bio_updated():
                 self.default_bio = bio
-                await self.update_bio(self.last_set_bio)
+                self.last_set_bio and (await self.update_bio(self.last_set_bio))
             await asyncio.sleep(1)
+
+    async def _was_bio_updated(self) -> bool:
+        bio = await self.get_bio()
+
+        differs_from_default = clean_whitespaces(bio) != clean_whitespaces(self.default_bio)
+        differs_from_last_set = clean_whitespaces(bio) != clean_whitespaces(self.last_set_bio)
+
+        if self.last_set_bio is None:
+            if differs_from_default:
+                return True
+            return False
+
+        return differs_from_default and differs_from_last_set
 
     async def _monitor_emoji_status_changes(self):
         while self.is_monitoring:
