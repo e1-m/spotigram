@@ -25,14 +25,14 @@ class TelegramClientManager:
         self.default_bio: str = ''
         self.default_emoji_status: int = 0
         self.last_set_bio: str | None = None
-        self.last_set_emoji_status: int = 0
+        self.last_set_emoji_status: int | None = None
         self.is_monitoring = False
 
     async def connect(self, phone, password=None):
         await self.tc.start(phone=phone, password=password)
         self.default_emoji_status = await self.get_emoji_status()
         self.default_bio = await self.get_bio() or ''
-        self.last_set_emoji_status = self.default_emoji_status
+        self.last_set_emoji_status = None
         self.last_set_bio = None
 
     async def get_emoji_status(self):
@@ -55,16 +55,18 @@ class TelegramClientManager:
     async def update_bio(self, new_bio: str):
         try:
             await self.tc(UpdateProfileRequest(about=new_bio))
-            self.last_set_bio = new_bio
         except RPCError:
             pass
+        else:
+            self.last_set_bio = new_bio
 
     async def update_emoji_status(self, new_emoji_status: int):
         try:
             await self.tc(UpdateEmojiStatusRequest(EmojiStatus(new_emoji_status)))
-            self.last_set_emoji_status = new_emoji_status
         except RPCError:
             pass
+        else:
+            self.last_set_emoji_status = new_emoji_status
 
     async def start_monitoring(self):
         if self.is_monitoring:
@@ -95,10 +97,20 @@ class TelegramClientManager:
 
         return differs_from_default and differs_from_last_set
 
+    async def _was_emoji_status_updated(self, emoji_status: int) -> bool:
+        differs_from_default = emoji_status != self.default_emoji_status
+
+        if self.last_set_emoji_status is None:
+            return differs_from_default
+
+        differs_from_last_set = emoji_status != self.last_set_emoji_status
+
+        return differs_from_default and differs_from_last_set
+
     async def _monitor_emoji_status_changes(self):
         while self.is_monitoring:
             emoji_status = await self.get_emoji_status()
-            if emoji_status != self.default_emoji_status and emoji_status != self.last_set_emoji_status:
+            if await self._was_emoji_status_updated(emoji_status):
                 self.default_emoji_status = emoji_status
-                await self.update_emoji_status(self.last_set_emoji_status)
+                self.last_set_bio and (await self.update_emoji_status(self.last_set_emoji_status))
             await asyncio.sleep(1)
