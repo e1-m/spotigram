@@ -80,19 +80,18 @@ class TelegramClientManager:
     async def _monitor_bio_changes(self):
         while self.is_monitoring:
             bio = await self.get_bio()
-            if self._was_bio_updated():
+            if await self._was_bio_updated(bio):
                 self.default_bio = bio
                 self.last_set_bio and (await self.update_bio(self.last_set_bio))
             await asyncio.sleep(1)
 
-    async def _was_bio_updated(self) -> bool:
-        bio = await self.get_bio()
-
+    async def _was_bio_updated(self, bio: str) -> bool:
         differs_from_default = clean_whitespaces(bio) != clean_whitespaces(self.default_bio)
-        differs_from_last_set = clean_whitespaces(bio) != clean_whitespaces(self.last_set_bio)
 
         if self.last_set_bio is None:
             return differs_from_default
+
+        differs_from_last_set = clean_whitespaces(bio) != clean_whitespaces(self.last_set_bio)
 
         return differs_from_default and differs_from_last_set
 
