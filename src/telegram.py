@@ -92,9 +92,7 @@ class TelegramClientManager:
         differs_from_last_set = clean_whitespaces(bio) != clean_whitespaces(self.last_set_bio)
 
         if self.last_set_bio is None:
-            if differs_from_default:
-                return True
-            return False
+            return differs_from_default
 
         return differs_from_default and differs_from_last_set
 
