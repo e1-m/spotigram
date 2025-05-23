@@ -45,22 +45,22 @@ class TelegramClientManager:
     async def display_track(self, track: Track):
         new_bio = build_listening_string(track)
 
-        await self.update_bio(new_bio)
+        await self._update_bio(new_bio)
         self.last_set_track_bio = new_bio
 
-        await self.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
+        await self._update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
 
     async def hide_track(self):
-        await self.update_bio(self.default_bio)
-        await self.update_emoji_status(self.default_emoji_status)
+        await self._update_bio(self.default_bio)
+        await self._update_emoji_status(self.default_emoji_status)
 
-    async def update_bio(self, new_bio: str):
+    async def _update_bio(self, new_bio: str):
         try:
             await self.tc(UpdateProfileRequest(about=new_bio))
         except RPCError:
             pass
 
-    async def update_emoji_status(self, new_emoji_status: int):
+    async def _update_emoji_status(self, new_emoji_status: int):
         try:
             await self.tc(UpdateEmojiStatusRequest(EmojiStatus(new_emoji_status)))
         except RPCError:
@@ -82,7 +82,7 @@ class TelegramClientManager:
             bio = await self.get_bio()
             if await self._was_bio_updated(bio):
                 self.default_bio = bio
-                self.last_set_track_bio and (await self.update_bio(self.last_set_track_bio))
+                self.last_set_track_bio and (await self._update_bio(self.last_set_track_bio))
             await asyncio.sleep(1)
 
     async def _was_bio_updated(self, bio: str) -> bool:
@@ -106,5 +106,6 @@ class TelegramClientManager:
             emoji_status = await self.get_emoji_status()
             if await self._was_emoji_status_updated(emoji_status):
                 self.default_emoji_status = emoji_status
-                await self.update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
+                # updates to SPOTIFY_EMOJI_STATUS_ID even if the previous emoji status isn't SPOTIFY_EMOJI_STATUS_ID
+                await self._update_emoji_status(settings.SPOTIFY_EMOJI_STATUS_ID)
             await asyncio.sleep(1)
