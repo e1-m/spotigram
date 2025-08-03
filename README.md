@@ -1,21 +1,22 @@
-# Spotigram
+# 🎵 Spotigram
 
-A lightweight app that automatically updates your Telegram bio to display the Spotify track you are currently listening to and sets a Spotify icon as your emoji status. Perfect for music lovers who want to share their vibe in real-time!
-
----
-
-## Features
-- **Real-Time Updates**: Syncs your current Spotify track to your Telegram bio seamlessly.
-- **Custom Emoji Status**: Automatically sets the Spotify icon as your emoji status.
+**Show your Spotify playback — live.**  
+Spotigram updates your **Telegram bio** in real-time with the **Spotify track you're currently listening to**, and sets
+a **Spotify emoji** as your status.
 
 ---
 
-## Requirements
-- **Telegram Premium**.
-- A server or local machine to run the app.
+## ✨ Features
+
+* 🎧 **Live Spotify Status**
+  Your Telegram bio updates automatically to display the song you're playing on Spotify.
+
+* 🔄 **Dynamic Emoji**
+  Spotigram sets the Spotify icon as your Telegram emoji status while you’re listening.
 
 ---
 
-## Installation
+## 📦 Requirements
 
-Coming soon...
+* 🟢 **Telegram Premium** (for emoji status)
+* 💻 A machine to run the app (local or remote server)
